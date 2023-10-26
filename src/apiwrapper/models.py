@@ -56,7 +56,7 @@ class ProjectileData(EntityData):
 @dataclass
 class Cell:
     cell_type: CellType
-    data: None | HitBoxData | ShipData | ProjectileData
+    data: dict | HitBoxData | ShipData | ProjectileData
 
 
 @dataclass
