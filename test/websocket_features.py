@@ -1,6 +1,6 @@
 import pytest
 
-import src.apiwrapper.websockets
+import src.apiwrapper.websocket_wrapper
 
 
 class WebSocketFeatures:
