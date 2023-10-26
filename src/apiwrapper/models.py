@@ -89,4 +89,5 @@ class ShootActionData:
 
 @dataclass
 class Command:
-    pass
+    action: str
+    payload: MoveActionData | TurnActionData | ShootActionData

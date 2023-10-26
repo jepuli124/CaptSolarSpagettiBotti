@@ -1,7 +1,10 @@
+from unittest.mock import patch
+
 import pytest
 
-from src.apiwrapper.models import Cell, CellType, Coordinates, CompassDirection
-from src.apiwrapper.serialization import deserialize_map
+from src.apiwrapper.models import Cell, CellType, Coordinates, CompassDirection, Command, MoveActionData, \
+    TurnActionData, ShootActionData
+from src.apiwrapper.serialization import deserialize_map, deserialize_game_state, serialize_command
 
 
 # noinspection PyMethodMayBeStatic
@@ -85,3 +88,50 @@ class SerializationFeatures:
         assert expected_projectile.data.direction == CompassDirection.SouthWest
         assert expected_projectile.data.velocity == 4
         assert expected_projectile.data.mass == 2
+
+    def should_deserialize_whole_matrix_at_a_time(self):
+        empty_cell = {"type": "empty", "data": {}}
+        empty_row = [empty_cell] * 10
+        empty_matrix = [empty_row] * 10
+
+        result_map = deserialize_map(empty_matrix)
+
+        assert len(result_map) == 10
+        assert all((len(row) == 10) for row in result_map)
+
+    def should_deserialize_game_state_to_turn_number_and_map(self):
+        game_state_dict = {
+            "gameMap": [[{"type": "empty", "data": {}}]],
+            "turnNumber": 82
+        }
+
+        result = deserialize_game_state(game_state_dict)
+
+        assert result.turn_number == 82
+        assert result.game_map == [[Cell(CellType.Empty, {})]]
+
+    def should_include_distance_on_move_action_serialization(self):
+        action = Command("move", MoveActionData(3))
+
+        json = serialize_command(action)
+
+        assert json["action"] == "move"
+        assert json["payload"]["distance"] == 3
+
+    def should_include_direction_on_turn_action_serialization(self):
+        action = Command("turn", TurnActionData(CompassDirection.West))
+
+        json = serialize_command(action)
+
+        assert json["action"] == "turn"
+        assert json["payload"]["direction"] == "west"
+
+    def should_include_speed_and_mass_on_shoot_action_serialization(self):
+        action = Command("shoot", ShootActionData(2, 5))
+
+        json = serialize_command(action)
+
+        assert json["action"] == "shoot"
+        assert json["payload"]["mass"] == 2
+        assert json["payload"]["speed"] == 5
+

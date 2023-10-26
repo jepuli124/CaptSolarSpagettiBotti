@@ -1,4 +1,5 @@
-from src.apiwrapper.models import Cell, CellType, HitBoxData, ShipData, Coordinates, CompassDirection, ProjectileData
+from src.apiwrapper.models import Cell, CellType, HitBoxData, ShipData, Coordinates, CompassDirection, ProjectileData, \
+    GameState, Command, MoveActionData, TurnActionData, ShootActionData
 
 _CELL_TYPE_MAPPING = {
     "empty": CellType.Empty,
@@ -9,7 +10,7 @@ _CELL_TYPE_MAPPING = {
     "projectile": CellType.Projectile
 }
 
-_COMPASS_DIRECTION_MAPPING = {
+_COMPASS_DESERIALIZATION_MAPPING = {
     "north": CompassDirection.North,
     "northEast": CompassDirection.NorthEast,
     "east": CompassDirection.East,
@@ -20,8 +21,19 @@ _COMPASS_DIRECTION_MAPPING = {
     "northWest": CompassDirection.NorthWest
 }
 
+_COMPASS_SERIALIZATION_MAPPING = {
+    CompassDirection.North: "north",
+    CompassDirection.NorthEast: "northEast",
+    CompassDirection.East: "east",
+    CompassDirection.SouthEast: "southEast",
+    CompassDirection.South: "south",
+    CompassDirection.SouthWest: "southWest",
+    CompassDirection.West: "west",
+    CompassDirection.NorthWest: "northWest"
+}
 
-def _deserialize_no_data(cell: dict) -> dict:
+
+def _deserialize_no_data(_: dict) -> dict:
     return {}
 
 
@@ -31,13 +43,13 @@ def _deserialize_hit_box(hit_box_data: dict) -> HitBoxData:
 
 def _deserialize_ship(ship_data: dict) -> ShipData:
     return ShipData(ship_data["id"], Coordinates(ship_data["position"]["x"], ship_data["position"]["y"]),
-                    _COMPASS_DIRECTION_MAPPING[ship_data["direction"]], ship_data["health"], ship_data["heat"])
+                    _COMPASS_DESERIALIZATION_MAPPING[ship_data["direction"]], ship_data["health"], ship_data["heat"])
 
 
 def _deserialize_projectile(projectile_data: dict) -> ProjectileData:
     projectile_coordinates = Coordinates(projectile_data["position"]["x"], projectile_data["position"]["y"])
     return ProjectileData(projectile_data["id"], projectile_coordinates,
-                          _COMPASS_DIRECTION_MAPPING[projectile_data["direction"]], projectile_data["velocity"],
+                          _COMPASS_DESERIALIZATION_MAPPING[projectile_data["direction"]], projectile_data["velocity"],
                           projectile_data["mass"])
 
 
@@ -62,3 +74,30 @@ def _deserialize_row(row: list[dict]) -> list[Cell]:
 def _deserialize_cell(cell: dict) -> Cell:
     cell_type = cell["type"]
     return Cell(_CELL_TYPE_MAPPING[cell_type], _CELL_DESERIALIZATION_MAPPING[cell_type](cell["data"]))
+
+
+def deserialize_game_state(game_state: dict) -> GameState:
+    return GameState(game_state["turnNumber"], deserialize_map(game_state["gameMap"]))
+
+
+def _serialize_move_action(action_data: MoveActionData) -> dict:
+    return {"distance": action_data.distance}
+
+
+def _serialize_turn_action(action_data: TurnActionData) -> dict:
+    return {"direction": _COMPASS_SERIALIZATION_MAPPING[action_data.direction]}
+
+
+def _serialize_shoot_action(action_data: ShootActionData) -> dict:
+    return {"mass": action_data.mass, "speed": action_data.speed}
+
+
+_ACTION_SERIALIZATION_MAPPING = {
+    "move": _serialize_move_action,
+    "turn": _serialize_turn_action,
+    "shoot": _serialize_shoot_action
+}
+
+
+def serialize_command(command: Command) -> dict:
+    return {"action": command.action, "payload": _ACTION_SERIALIZATION_MAPPING[command.action](command.payload)}
