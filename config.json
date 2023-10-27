@@ -2,5 +2,11 @@
   "websocket_url": "placeholder",
   "websocket_port": "1234",
   "token": "myBotToken",
-  "tick_ms": 500
+  "tick_ms": 500,
+  "wrapper_log_file": "wrapper.log",
+  "wrapper_log_stream": "stdout",
+  "wrapper_log_level": "DEBUG",
+  "ai_log_file": "wrapper.log",
+  "ai_log_stream": "stdout",
+  "ai_log_level": "DEBUG"
 }

@@ -1,6 +1,7 @@
 import json
 import multiprocessing
 from enum import Enum
+from logging import getLogger
 from multiprocessing.pool import ThreadPool
 
 from websockets.sync.client import connect
@@ -12,6 +13,9 @@ from team_ai import process_tick
 
 
 _TICK_FAILSAFE_TIME_MS = 100
+
+
+_logger = getLogger("wrapper.websockets")
 
 
 class ClientState(Enum):
@@ -34,7 +38,7 @@ class Client:
 def handle_auth_ack(client, *_):
     if client.state == ClientState.Unauthorized:
         client.state = ClientState.Idle
-        print("Authorization successful")
+        _logger.info("Authorization successful")
 
 
 def handle_game_start(client, _, websocket):
@@ -87,10 +91,10 @@ def authorize_client(websocket,  token: str):
 
 
 def receive_message(client: Client, websocket):
-    print("Waiting for message...")
+    _logger.info("Waiting for message...")
     raw_message = websocket.recv()
     message = json.loads(raw_message)
-    print(f"Received: {message}")
+    _logger.info(f"Received: {message}")
     handler = _EVENT_HANDLERS.get(message["eventType"], None)
     if handler is not None:
         _EVENT_HANDLERS[message["eventType"]](client, message["data"], websocket)
