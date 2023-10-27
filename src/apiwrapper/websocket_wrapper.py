@@ -1,10 +1,7 @@
-import asyncio
 import json
 import multiprocessing
-from abc import ABC, abstractmethod
 from enum import Enum
 from multiprocessing.pool import ThreadPool
-from typing import Callable, Any
 
 from websockets.sync.client import connect
 
@@ -12,6 +9,9 @@ from apiwrapper.helpers import get_config
 from apiwrapper.models import Command, MoveActionData, GameState
 from apiwrapper.serialization import deserialize_game_state, serialize_command
 from team_ai import process_tick
+
+
+_TICK_FAILSAFE_TIME_MS = 100
 
 
 class ClientState(Enum):
@@ -60,7 +60,7 @@ def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command
     try:
         with ThreadPool() as pool:
             return pool.apply_async(process_tick, (client.context, state)).get(
-                timeout=int(get_config("tick_ms")) / 1000)
+                timeout=(int(get_config("tick_ms")) - _TICK_FAILSAFE_TIME_MS) / 1000)
     except multiprocessing.TimeoutError:
         return None
 
@@ -81,17 +81,24 @@ _EVENT_HANDLERS = {
 }
 
 
-def connect_websocket(url: str, port: int):
-    client = Client()
+def authorize_client(websocket,  token: str):
+    auth_msg = json.dumps({"eventType": "auth", "data": {"token": token}})
+    websocket.send(auth_msg)
+
+
+def receive_message(client: Client, websocket):
+    print("Waiting for message...")
+    raw_message = websocket.recv()
+    message = json.loads(raw_message)
+    print(f"Received: {message}")
+    handler = _EVENT_HANDLERS.get(message["eventType"], None)
+    if handler is not None:
+        _EVENT_HANDLERS[message["eventType"]](client, message["data"], websocket)
+
+
+def connect_websocket(url: str, port: int, token: str):  # pragma: no cover -- main loop - runs forever, cannot test
+    client = Client(ClientState.Unauthorized)
     with connect(f"ws://{url}:{port}") as websocket:
-        client.state = ClientState.Unauthorized
-        auth_msg = json.dumps({"eventType": "auth", "data": {"token": "myToken"}})
-        websocket.send(auth_msg)
+        authorize_client(websocket, token)
         while True:
-            print("Waiting for message...")
-            raw_message = websocket.recv()
-            message = json.loads(raw_message)
-            print(f"Received: {message}")
-            handler = _EVENT_HANDLERS.get(message["eventType"], None)
-            if handler is not None:
-                _EVENT_HANDLERS[message["eventType"]](client, message["data"], websocket)
+            receive_message(client, websocket)

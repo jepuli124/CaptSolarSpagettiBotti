@@ -6,9 +6,10 @@ import pytest
 
 import team_ai
 import apiwrapper.serialization
+from apiwrapper import websocket_wrapper
 from apiwrapper.models import GameState, Cell, CellType, Command, MoveActionData
 from apiwrapper.websocket_wrapper import Client, handle_auth_ack, ClientState, handle_game_start, ClientContext, \
-    handle_game_tick, handle_game_end
+    handle_game_tick, handle_game_end, authorize_client, receive_message
 
 
 # noinspection PyMethodMayBeStatic
@@ -107,7 +108,7 @@ class WebsocketFeatures:
             sleep(0.2)
             return Command("move", MoveActionData(3))
 
-        monkeypatch.setenv("tick_ms", "100")
+        monkeypatch.setenv("tick_ms", "200")
         client = Client(ClientState.InGame)
         websocket = Mock()
         move_command_dict = {
@@ -161,3 +162,31 @@ class WebsocketFeatures:
             handle_game_end(client, Mock(), Mock())
 
         assert str(actual_exception.value) == f"Game can only be ended in in game state! State right now is: {state}"
+
+    def should_send_auth_token_on_authorize_client(self, monkeypatch):
+        actual_token = "token"
+        websocket = Mock()
+
+        authorize_client(websocket, actual_token)
+
+        websocket.send.assert_called_with(json.dumps({"eventType": "auth", "data": {"token": actual_token}}))
+
+    def should_call_correct_event_handler_on_event(self):
+        event_name = "myTestEvent"
+        test_handler = Mock()
+        websocket_wrapper._EVENT_HANDLERS = {event_name: test_handler}
+        websocket = Mock()
+        client = Mock()
+        mock_data = {"mock_data": 1}
+        websocket.recv.return_value = json.dumps({"eventType": event_name, "data": mock_data})
+
+        receive_message(client, websocket)
+
+        test_handler.assert_called_with(client, mock_data, websocket)
+
+    def should_call_no_event_handler_on_unknown_event(self):
+        websocket_wrapper._EVENT_HANDLERS = {}
+        websocket = Mock()
+        websocket.recv.return_value = json.dumps({"eventType": "invalid", "data": {}})
+
+        receive_message(Mock(), websocket)

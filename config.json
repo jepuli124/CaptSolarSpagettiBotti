@@ -1,5 +1,6 @@
 {
   "websocket_url": "placeholder",
   "websocket_port": "1234",
+  "token": "myBotToken",
   "tick_ms": 500
 }
