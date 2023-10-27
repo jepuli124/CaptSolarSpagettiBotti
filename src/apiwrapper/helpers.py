@@ -2,7 +2,7 @@ import json
 import os
 
 
-def get_config(config_name: str):
+def get_config(config_name: str) -> str | int:
     config = os.getenv(config_name, None)
     if config is None:
         file_path = os.path.join(os.path.dirname(__file__), "..\\..\\config.json")

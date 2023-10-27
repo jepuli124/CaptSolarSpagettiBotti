@@ -1,13 +1,15 @@
 import asyncio
 import json
+import multiprocessing
 from abc import ABC, abstractmethod
 from enum import Enum
+from multiprocessing.pool import ThreadPool
 from typing import Callable, Any
 
 from websockets.sync.client import connect
 
 from apiwrapper.helpers import get_config
-from apiwrapper.models import Command, MoveActionData
+from apiwrapper.models import Command, MoveActionData, GameState
 from apiwrapper.serialization import deserialize_game_state, serialize_command
 from team_ai import process_tick
 
@@ -47,11 +49,20 @@ def handle_game_tick(client, raw_state, websocket):
     assert client.state == ClientState.InGame, (f"Game ticks can only be handled while in in-game state! State right "
                                                 f"now is: {client.state}")
     state = deserialize_game_state(raw_state)
-    action = process_tick(client.context, state)
+    action = _handle_tick_processing_timeout(client, state)
     if action is None:
         action = Command("move", MoveActionData(0))
     serialized_action = serialize_command(action)
     websocket.send(json.dumps({"eventType": "gameAction", "data": serialized_action}))
+
+
+def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command | None:
+    try:
+        with ThreadPool() as pool:
+            return pool.apply_async(process_tick, (client.context, state)).get(
+                timeout=int(get_config("tick_ms")) / 1000)
+    except multiprocessing.TimeoutError:
+        return None
 
 
 def handle_game_end(client, _, websocket):

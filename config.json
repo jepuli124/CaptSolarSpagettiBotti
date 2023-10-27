@@ -1,4 +1,5 @@
 {
   "websocket_url": "placeholder",
-  "websocket_port": 1234
+  "websocket_port": "1234",
+  "tick_ms": 500
 }

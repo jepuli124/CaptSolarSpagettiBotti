@@ -1,4 +1,9 @@
-from apiwrapper.websocket_wrapper import ClientContext
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from apiwrapper.websocket_wrapper import ClientContext
 from src.apiwrapper.models import GameState, Command
 
 
