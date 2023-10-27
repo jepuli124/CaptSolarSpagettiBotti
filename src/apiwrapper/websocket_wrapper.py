@@ -19,10 +19,14 @@ class ClientState(Enum):
     InGame = 3
 
 
+class ClientContext:
+    pass
+
+
 class Client:
-    def __init__(self):
-        self.state: ClientState = ClientState.Unconnected
-        self.context = None
+    def __init__(self, state: ClientState = ClientState.Unconnected, context: ClientContext = None):
+        self.state: ClientState = state
+        self.context: ClientContext = context if context is not None else ClientContext()
 
 
 def handle_auth_ack(client, *_):
@@ -34,14 +38,14 @@ def handle_auth_ack(client, *_):
 def handle_game_start(client, _, websocket):
     assert client.state == ClientState.Idle, (f"Game can only be started in idle state! State right now is: "
                                               f"{client.state}")
-    client.context = None
+    client.context = ClientContext()
     client.state = ClientState.InGame
     websocket.send(json.dumps({"eventType": "startAck", "data": {}}))
 
 
 def handle_game_tick(client, raw_state, websocket):
-    assert client.state == ClientState.InGame, (f"Game ticks can only be handled while in in-game state! State right"
-                                                f"now is {client.state}")
+    assert client.state == ClientState.InGame, (f"Game ticks can only be handled while in in-game state! State right "
+                                                f"now is: {client.state}")
     state = deserialize_game_state(raw_state)
     action = process_tick(client.context, state)
     if action is None:
@@ -53,7 +57,7 @@ def handle_game_tick(client, raw_state, websocket):
 def handle_game_end(client, _, websocket):
     assert client.state == ClientState.InGame, (f"Game can only be ended in in game state! State right now is: "
                                                 f"{client.state}")
-    client.context = None
+    client.context = ClientContext()
     client.state = ClientState.Idle
     websocket.send(json.dumps({"eventType": "endAck", "data": {}}))
 
@@ -70,8 +74,8 @@ def connect_websocket(url: str, port: int):
     client = Client()
     with connect(f"ws://{url}:{port}") as websocket:
         client.state = ClientState.Unauthorized
-        open_msg = json.dumps({"eventType": "auth", "data": {"token": "myToken"}})
-        websocket.send(open_msg)
+        auth_msg = json.dumps({"eventType": "auth", "data": {"token": "myToken"}})
+        websocket.send(auth_msg)
         while True:
             print("Waiting for message...")
             raw_message = websocket.recv()
