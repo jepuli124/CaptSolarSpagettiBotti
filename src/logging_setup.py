@@ -120,7 +120,7 @@ def stream_supports_colour(stream: Any) -> bool:
 
     # Pycharm and Vscode support colour in their inbuilt editors
     if 'PYCHARM_HOSTED' in os.environ or os.environ.get('TERM_PROGRAM') == 'vscode':
-        return is_a_tty
+        return True
 
     if sys.platform != 'win32':
         # Docker does not consistently have a tty attached to it

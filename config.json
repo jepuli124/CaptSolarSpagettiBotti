@@ -1,6 +1,6 @@
 {
-  "websocket_url": "placeholder",
-  "websocket_port": "1234",
+  "websocket_url": "localhost",
+  "websocket_port": "8765",
   "token": "myBotToken",
   "tick_ms": 500,
   "wrapper_log_file": "wrapper.log",

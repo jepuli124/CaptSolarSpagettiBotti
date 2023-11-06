@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from apiwrapper.websocket_wrapper import ClientContext
-from src.apiwrapper.models import GameState, Command
+from apiwrapper.models import GameState, Command
 
 
 ai_logger = getLogger("ai")

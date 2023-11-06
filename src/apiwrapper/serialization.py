@@ -1,4 +1,4 @@
-from src.apiwrapper.models import Cell, CellType, HitBoxData, ShipData, Coordinates, CompassDirection, ProjectileData, \
+from apiwrapper.models import Cell, CellType, HitBoxData, ShipData, Coordinates, CompassDirection, ProjectileData, \
     GameState, Command, MoveActionData, TurnActionData, ShootActionData
 
 _CELL_TYPE_MAPPING = {
