@@ -78,7 +78,7 @@ def _build_logger(log_type: str):
 
 def setup_logging():
     _build_logger("wrapper")
-    _build_logger("ai")
+    _build_logger("team_ai")
     getLogger("wrapper.logging").info("Logging set up successfully")
 
 

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from apiwrapper.models import GameState, Command
 
 
-ai_logger = getLogger("ai")
+ai_logger = getLogger("team_ai")
 
 
 def process_tick(context: ClientContext, game_state: GameState) -> Command | None:

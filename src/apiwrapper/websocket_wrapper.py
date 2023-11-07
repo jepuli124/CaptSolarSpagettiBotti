@@ -75,7 +75,6 @@ def handle_game_end(client, _, websocket):
     client.context = ClientContext()
     client.state = ClientState.Idle
     websocket.send(json.dumps({"eventType": "endAck", "data": {}}))
-    assert False, "Test exception to validate logging..."
 
 
 _EVENT_HANDLERS = {
