@@ -190,3 +190,21 @@ class WebsocketFeatures:
         websocket.recv.return_value = json.dumps({"eventType": "invalid", "data": {}})
 
         receive_message(Mock(), websocket)
+
+    def should_log_error_on_handler_throw(self):
+        event_name = "myTestEvent"
+        test_handler = Mock()
+        mock_error = Exception("my error message")
+        test_handler.side_effect = mock_error
+        websocket_wrapper._EVENT_HANDLERS = {event_name: test_handler}
+        websocket = Mock()
+        client = Mock()
+        mock_data = {"mock_data": 1}
+        websocket.recv.return_value = json.dumps({"eventType": event_name, "data": mock_data})
+
+        with patch("apiwrapper.websocket_wrapper._logger") as mock_logger:
+            receive_message(client, websocket)
+            mock_logger.error.assert_called_with(f"Exception raised during websocket event handling! "
+                                                 f"Exception: '{mock_error}'")
+
+        test_handler.assert_called_with(client, mock_data, websocket)

@@ -2,9 +2,9 @@ from unittest.mock import patch
 
 import pytest
 
-from src.apiwrapper.models import Cell, CellType, Coordinates, CompassDirection, Command, MoveActionData, \
+from apiwrapper.models import Cell, CellType, Coordinates, CompassDirection, Command, MoveActionData, \
     TurnActionData, ShootActionData
-from src.apiwrapper.serialization import deserialize_map, deserialize_game_state, serialize_command
+from apiwrapper.serialization import deserialize_map, deserialize_game_state, serialize_command
 
 
 # noinspection PyMethodMayBeStatic

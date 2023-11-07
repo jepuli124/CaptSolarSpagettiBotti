@@ -143,7 +143,7 @@ class _ColourFormatter(Formatter):
     # 1 means bold, 2 means dim, 0 means reset, and 4 means underline.
 
     LEVEL_COLOURS = [
-        (DEBUG, '\x1b[40;1m'),
+        (DEBUG, '\x1b[37;1m'),
         (INFO, '\x1b[34;1m'),
         (WARNING, '\x1b[33;1m'),
         (ERROR, '\x1b[31m'),

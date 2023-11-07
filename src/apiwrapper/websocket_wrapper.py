@@ -75,6 +75,7 @@ def handle_game_end(client, _, websocket):
     client.context = ClientContext()
     client.state = ClientState.Idle
     websocket.send(json.dumps({"eventType": "endAck", "data": {}}))
+    assert False, "Test exception to validate logging..."
 
 
 _EVENT_HANDLERS = {
@@ -91,13 +92,16 @@ def authorize_client(websocket,  token: str):
 
 
 def receive_message(client: Client, websocket):
-    _logger.info("Waiting for message...")
+    _logger.debug("Waiting for message...")
     raw_message = websocket.recv()
     message = json.loads(raw_message)
-    _logger.info(f"Received: {message}")
+    _logger.debug(f"Received: {message}")
     handler = _EVENT_HANDLERS.get(message["eventType"], None)
     if handler is not None:
-        _EVENT_HANDLERS[message["eventType"]](client, message["data"], websocket)
+        try:
+            _EVENT_HANDLERS[message["eventType"]](client, message["data"], websocket)
+        except Exception as exception:
+            _logger.error(f"Exception raised during websocket event handling! Exception: '{exception}'")
 
 
 def connect_websocket(url: str, port: int, token: str):  # pragma: no cover -- main loop - runs forever, cannot test
