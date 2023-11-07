@@ -106,7 +106,7 @@ def connect_websocket(url: str, port: int, token: str):  # pragma: no cover -- m
 
 
 def authorize_client(websocket,  token: str):
-    _logger.debug(f"Authorizing client with token {token}")
+    _logger.info(f"Authorizing client with token {token}")
     _send_websocket_message(websocket, {"eventType": "auth", "data": {"token": token}})
 
 
