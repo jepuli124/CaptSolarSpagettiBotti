@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from logging import getLogger
+from time import sleep
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:

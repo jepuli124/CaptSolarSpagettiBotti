@@ -9,7 +9,7 @@ import apiwrapper.serialization
 from apiwrapper import websocket_wrapper
 from apiwrapper.models import GameState, Cell, CellType, Command, MoveActionData
 from apiwrapper.websocket_wrapper import Client, handle_auth_ack, ClientState, handle_game_start, ClientContext, \
-    handle_game_tick, handle_game_end, authorize_client, receive_message
+    handle_game_tick, handle_game_end, authorize_client, handle_loop
 
 
 # noinspection PyMethodMayBeStatic
@@ -180,7 +180,7 @@ class WebsocketFeatures:
         mock_data = {"mock_data": 1}
         websocket.recv.return_value = json.dumps({"eventType": event_name, "data": mock_data})
 
-        receive_message(client, websocket)
+        handle_loop(client, websocket)
 
         test_handler.assert_called_with(client, mock_data, websocket)
 
@@ -189,7 +189,7 @@ class WebsocketFeatures:
         websocket = Mock()
         websocket.recv.return_value = json.dumps({"eventType": "invalid", "data": {}})
 
-        receive_message(Mock(), websocket)
+        handle_loop(Mock(), websocket)
 
     def should_log_error_on_handler_throw(self):
         event_name = "myTestEvent"
@@ -203,7 +203,7 @@ class WebsocketFeatures:
         websocket.recv.return_value = json.dumps({"eventType": event_name, "data": mock_data})
 
         with patch("apiwrapper.websocket_wrapper._logger") as mock_logger:
-            receive_message(client, websocket)
+            handle_loop(client, websocket)
             mock_logger.error.assert_called_with(f"Exception raised during websocket event handling! "
                                                  f"Exception: '{mock_error}'")
 

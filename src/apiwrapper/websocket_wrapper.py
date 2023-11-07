@@ -35,6 +35,12 @@ class Client:
         self.context: ClientContext = context if context is not None else ClientContext()
 
 
+def _send_websocket_message(websocket, raw_message: dict):
+    message = json.dumps(raw_message)
+    websocket.send(message)
+    _logger.debug(f"Sent: {message}")
+
+
 def handle_auth_ack(client, *_):
     if client.state == ClientState.Unauthorized:
         client.state = ClientState.Idle
@@ -46,7 +52,7 @@ def handle_game_start(client, _, websocket):
                                               f"{client.state}")
     client.context = ClientContext()
     client.state = ClientState.InGame
-    websocket.send(json.dumps({"eventType": "startAck", "data": {}}))
+    _send_websocket_message(websocket, {"eventType": "startAck", "data": {}})
 
 
 def handle_game_tick(client, raw_state, websocket):
@@ -54,18 +60,22 @@ def handle_game_tick(client, raw_state, websocket):
                                                 f"now is: {client.state}")
     state = deserialize_game_state(raw_state)
     action = _handle_tick_processing_timeout(client, state)
+    # None is returned on timeout, should be converted to empty action -> move 0 steps
     if action is None:
         action = Command("move", MoveActionData(0))
     serialized_action = serialize_command(action)
-    websocket.send(json.dumps({"eventType": "gameAction", "data": serialized_action}))
+    _send_websocket_message(websocket, {"eventType": "gameAction", "data": serialized_action})
 
 
 def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command | None:
+    timeout_ms = int(get_config("tick_ms")) - _TICK_FAILSAFE_TIME_MS
     try:
         with ThreadPool() as pool:
             return pool.apply_async(process_tick, (client.context, state)).get(
-                timeout=(int(get_config("tick_ms")) - _TICK_FAILSAFE_TIME_MS) / 1000)
+                timeout=(timeout_ms / 1000))
     except multiprocessing.TimeoutError:
+        # We catch and log instead of propagating so the wrapper layer still knows to send an empty event
+        _logger.error(f"Team ai function timed out after {timeout_ms} milliseconds.")
         return None
 
 
@@ -74,7 +84,7 @@ def handle_game_end(client, _, websocket):
                                                 f"{client.state}")
     client.context = ClientContext()
     client.state = ClientState.Idle
-    websocket.send(json.dumps({"eventType": "endAck", "data": {}}))
+    _send_websocket_message(websocket, {"eventType": "endAck", "data": {}})
 
 
 _EVENT_HANDLERS = {
@@ -85,27 +95,38 @@ _EVENT_HANDLERS = {
 }
 
 
+def connect_websocket(url: str, port: int, token: str):  # pragma: no cover -- main loop - runs forever, cannot test
+    client = Client(ClientState.Unauthorized)
+    websocket_address = f"ws://{url}:{port}"
+    _logger.debug(f"Connecting to web socket at {websocket_address}")
+    with connect(websocket_address) as websocket:
+        authorize_client(websocket, token)
+        while True:
+            handle_loop(client, websocket)
+
+
 def authorize_client(websocket,  token: str):
-    auth_msg = json.dumps({"eventType": "auth", "data": {"token": token}})
-    websocket.send(auth_msg)
+    _logger.debug(f"Authorizing client with token {token}")
+    _send_websocket_message(websocket, {"eventType": "auth", "data": {"token": token}})
 
 
-def receive_message(client: Client, websocket):
+def handle_loop(client: Client, websocket):
+    message = receive_message(websocket)
+    handler = _EVENT_HANDLERS.get(message["eventType"], None)
+    if handler is not None:
+        try_run_handler(client, message, websocket, handler)
+
+
+def receive_message(websocket) -> dict:
     _logger.debug("Waiting for message...")
     raw_message = websocket.recv()
     message = json.loads(raw_message)
     _logger.debug(f"Received: {message}")
-    handler = _EVENT_HANDLERS.get(message["eventType"], None)
-    if handler is not None:
-        try:
-            _EVENT_HANDLERS[message["eventType"]](client, message["data"], websocket)
-        except Exception as exception:
-            _logger.error(f"Exception raised during websocket event handling! Exception: '{exception}'")
+    return message
 
 
-def connect_websocket(url: str, port: int, token: str):  # pragma: no cover -- main loop - runs forever, cannot test
-    client = Client(ClientState.Unauthorized)
-    with connect(f"ws://{url}:{port}") as websocket:
-        authorize_client(websocket, token)
-        while True:
-            receive_message(client, websocket)
+def try_run_handler(client: Client, message: dict, websocket, handler):
+    try:
+        handler(client, message["data"], websocket)
+    except Exception as exception:
+        _logger.error(f"Exception raised during websocket event handling! Exception: '{exception}'")

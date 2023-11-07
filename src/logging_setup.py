@@ -79,7 +79,7 @@ def _build_logger(log_type: str):
 def setup_logging():
     _build_logger("wrapper")
     _build_logger("team_ai")
-    getLogger("wrapper.logging").info("Logging set up successfully")
+    getLogger("wrapper.logging").debug("Logging set up successfully")
 
 
 # The code from this row onwards is borrowed from discord.py library source code (logging/utils)
