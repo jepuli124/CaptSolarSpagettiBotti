@@ -26,6 +26,10 @@ class ClientState(Enum):
 
 
 class ClientContext:
+    """The persistent context of the current game.
+
+    You can either add data to this class ad-hoc, or if you want or need static type checking you can edit this class
+    to include fields for the data you want to store between ticks."""
     pass
 
 
