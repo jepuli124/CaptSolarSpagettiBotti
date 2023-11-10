@@ -101,9 +101,8 @@ _EVENT_HANDLERS = {
 
 def connect_websocket(url: str, token: str, bot_name: str):  # pragma: no cover -- main loop - runs forever
     client = Client(ClientState.Unauthorized)
-    websocket_address = f"ws://{url}"
-    _logger.debug(f"Connecting to web socket at {websocket_address}")
-    with connect(websocket_address) as websocket:
+    _logger.debug(f"Connecting to web socket at {url}")
+    with connect(url) as websocket:
         authorize_client(websocket, token, bot_name)
         while True:
             handle_loop(client, websocket)
@@ -124,8 +123,8 @@ def handle_loop(client: Client, websocket):
 def receive_message(websocket) -> dict:
     _logger.debug("Waiting for message...")
     raw_message = websocket.recv()
+    _logger.debug(f"Received: {raw_message}")
     message = json.loads(raw_message)
-    _logger.debug(f"Received: {message}")
     return message
 
 
