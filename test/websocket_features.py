@@ -163,13 +163,15 @@ class WebsocketFeatures:
 
         assert str(actual_exception.value) == f"Game can only be ended in in game state! State right now is: {state}"
 
-    def should_send_auth_token_on_authorize_client(self, monkeypatch):
+    def should_send_auth_token_and_bot_name_on_authorize_client(self):
         actual_token = "token"
+        actual_name = "name"
         websocket = Mock()
 
-        authorize_client(websocket, actual_token)
+        authorize_client(websocket, actual_token, actual_name)
 
-        websocket.send.assert_called_with(json.dumps({"eventType": "auth", "data": {"token": actual_token}}))
+        websocket.send.assert_called_with(
+            json.dumps({"eventType": "auth", "data": {"token": actual_token, "botName": actual_name}}))
 
     def should_call_correct_event_handler_on_event(self):
         event_name = "myTestEvent"

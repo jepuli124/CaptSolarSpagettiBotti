@@ -2,6 +2,7 @@
   "websocket_url": "localhost",
   "websocket_port": "8765",
   "token": "myBotToken",
+  "bot_name": "main",
   "tick_ms": 1000,
   "wrapper_log_file": "wrapper.log",
   "wrapper_log_stream": "stderr",

@@ -99,19 +99,19 @@ _EVENT_HANDLERS = {
 }
 
 
-def connect_websocket(url: str, port: int, token: str):  # pragma: no cover -- main loop - runs forever, cannot test
+def connect_websocket(url: str, port: int, token: str, bot_name: str):  # pragma: no cover -- main loop - runs forever
     client = Client(ClientState.Unauthorized)
     websocket_address = f"ws://{url}:{port}"
     _logger.debug(f"Connecting to web socket at {websocket_address}")
     with connect(websocket_address) as websocket:
-        authorize_client(websocket, token)
+        authorize_client(websocket, token, bot_name)
         while True:
             handle_loop(client, websocket)
 
 
-def authorize_client(websocket,  token: str):
-    _logger.info(f"Authorizing client with token {token}")
-    _send_websocket_message(websocket, {"eventType": "auth", "data": {"token": token}})
+def authorize_client(websocket, token: str, bot_name: str):
+    _logger.info(f"Authorizing client with token '{token}' and name '{bot_name}'.")
+    _send_websocket_message(websocket, {"eventType": "auth", "data": {"token": token, "botName": bot_name}})
 
 
 def handle_loop(client: Client, websocket):
