@@ -1,11 +1,11 @@
 {
-  "websocket_url": "ws://localhost:3000/socket",
+  "websocket_url": "ws://localhost:8080/socket",
   "token": "myBotToken",
   "bot_name": "main",
   "tick_ms": 1000,
   "wrapper_log_file": "wrapper.log",
   "wrapper_log_stream": "stdout",
-  "wrapper_log_level": "INFO",
+  "wrapper_log_level": "DEBUG",
   "team_ai_log_file": "wrapper.log",
   "team_ai_log_stream": "stdout",
   "team_ai_log_level": "DEBUG"
