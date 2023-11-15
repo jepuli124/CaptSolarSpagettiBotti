@@ -30,7 +30,7 @@ def process_tick(context: ClientContext, game_state: GameState) -> Command | Non
     """Main function defining the behaviour of the AI of the team
 
     Arguments:
-        context (ClientContext): persistent context that can be stored data between ticks. Wiped on game creation
+        context (ClientContext): persistent context that can store data and state between ticks. Wiped on game creation
         game_state (GameState): the current state of the game
 
     Returns:
