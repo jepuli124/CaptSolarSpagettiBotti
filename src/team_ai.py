@@ -29,7 +29,7 @@ Examples:
 def process_tick(context: ClientContext, game_state: GameState) -> Command | None:
     """Main function defining the behaviour of the AI of the team
 
-    Attributes:
+    Arguments:
         context (ClientContext): persistent context that can be stored data between ticks. Wiped on game creation
         game_state (GameState): the current state of the game
 
