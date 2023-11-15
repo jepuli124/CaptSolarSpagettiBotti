@@ -20,7 +20,7 @@ Examples:
     >>> ai_logger.info("A message that you want to see to know the state of the bot during normal operation.")
     >>> ai_logger.warning("A message that demands attention, but is not yet causing problems.")
     >>> ai_logger.error("A message about the bot reaching an erroneous state")
-    >>> ai_logger.exception("A message that is same as error, but can be only called in Except blogs. " +
+    >>> ai_logger.exception("A message that is same as error, but can be only called in Except blocks. " +
     >>>                     "Includes exception info in the log")
     >>> ai_logger.critical("A message about a critical exception, usually causing a premature shutdown")
 """
