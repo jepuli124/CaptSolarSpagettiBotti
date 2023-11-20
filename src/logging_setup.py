@@ -3,7 +3,7 @@ import sys
 from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL, FileHandler, Handler, Formatter, StreamHandler, getLogger
 from typing import Any
 
-from apiwrapper.helpers import get_config
+from helpers import get_config
 
 # Borrowed from my own project: ClusterBot (see EddieTheCubeHead in github)  - Eetu
 

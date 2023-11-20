@@ -3,6 +3,7 @@
   "token": "myBotToken",
   "bot_name": "main",
   "tick_ms": 1000,
+  "max_turn_radius": 2,
   "wrapper_log_file": "wrapper.log",
   "wrapper_log_stream": "stdout",
   "wrapper_log_level": "DEBUG",

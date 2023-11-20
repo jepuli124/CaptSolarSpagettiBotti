@@ -6,7 +6,7 @@ from multiprocessing.pool import ThreadPool
 
 from websockets.sync.client import connect
 
-from apiwrapper.helpers import get_config
+from helpers import get_config
 from apiwrapper.models import Command, MoveActionData, GameState
 from apiwrapper.serialization import deserialize_game_state, serialize_command
 from team_ai import process_tick
