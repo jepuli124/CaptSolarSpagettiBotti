@@ -32,23 +32,25 @@ class WebsocketFeatures:
 
     def should_set_state_to_in_game_on_game_start(self):
         client = Client(ClientState.Idle)
-        handle_game_start(client, Mock(), Mock())
+        handle_game_start(client, {"tickLength": 100, "turnRate": 2}, Mock())
 
         assert client.state == ClientState.InGame
 
     def should_reset_context_on_game_start(self):
-        context = ClientContext()
+        context = ClientContext(500, 1)
         client = Client(ClientState.Idle, context)
 
-        handle_game_start(client, Mock(), Mock())
+        handle_game_start(client, {"tickLength": 100, "turnRate": 2}, Mock())
 
         assert client.context is not context
+        assert client.context.tick_length_ms == 100
+        assert client.context.turn_rate == 2
 
     def should_send_ack_to_websocket_on_game_start(self):
         client = Client(ClientState.Idle)
         websocket = Mock()
 
-        handle_game_start(client, Mock(), websocket)
+        handle_game_start(client, {"tickLength": 100, "turnRate": 2}, websocket)
 
         websocket.send.assert_called_with(json.dumps({"eventType": "startAck", "data": {}}))
 
@@ -68,6 +70,7 @@ class WebsocketFeatures:
                                                                                 mock_state_deserialization,
                                                                                 mock_command_serialization):
         client = Client(ClientState.InGame)
+        client.context = ClientContext(500, 2)
         websocket = Mock()
         move_command_dict = {
             "actionType": "move",
@@ -87,6 +90,7 @@ class WebsocketFeatures:
                                                                                         mock_state_deserialization,
                                                                                         mock_command_serialization):
         client = Client(ClientState.InGame)
+        client.context = ClientContext(500, 2)
         websocket = Mock()
         move_command_dict = {
             "actionType": "move",
@@ -103,13 +107,13 @@ class WebsocketFeatures:
     @patch("apiwrapper.websocket_wrapper.deserialize_game_state")
     @patch("apiwrapper.websocket_wrapper.process_tick")
     def should_timeout_game_tick_processing_after_config_timeout(self, mock_tick_handler, mock_state_deserialization,
-                                                                 mock_command_serialization, monkeypatch):
+                                                                 mock_command_serialization):
         def delayed_processing(*_):
-            sleep(0.2)
+            sleep(0.1)
             return Command("move", MoveActionData(3))
 
-        monkeypatch.setenv("tick_ms", "200")
         client = Client(ClientState.InGame)
+        client.context = ClientContext(100, 2)
         websocket = Mock()
         move_command_dict = {
             "actionType": "move",
@@ -139,7 +143,7 @@ class WebsocketFeatures:
         assert client.state == ClientState.Idle
 
     def should_reset_context_on_game_end(self):
-        context = ClientContext()
+        context = ClientContext(500, 2)
         client = Client(ClientState.InGame, context)
 
         handle_game_end(client, Mock(), Mock())

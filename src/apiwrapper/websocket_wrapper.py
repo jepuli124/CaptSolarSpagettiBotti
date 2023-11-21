@@ -12,7 +12,7 @@ from apiwrapper.serialization import deserialize_game_state, serialize_command
 from team_ai import process_tick
 
 
-_TICK_FAILSAFE_TIME_MS = 100
+_TICK_FAILSAFE_TIME_MS = 20
 
 
 _logger = getLogger("wrapper.websockets")
@@ -30,13 +30,16 @@ class ClientContext:
 
     You can either add data to this class ad-hoc, or if you want or need static type checking you can edit this class
     to include fields for the data you want to store between ticks."""
-    pass
+
+    def __init__(self, tick_length_ms: int, turn_rate: int):
+        self.tick_length_ms = tick_length_ms
+        self.turn_rate = turn_rate
 
 
 class Client:
     def __init__(self, state: ClientState = ClientState.Unconnected, context: ClientContext = None):
         self.state: ClientState = state
-        self.context: ClientContext = context if context is not None else ClientContext()
+        self.context: ClientContext = context
 
 
 def _send_websocket_message(websocket, raw_message: dict):
@@ -51,10 +54,10 @@ def handle_auth_ack(client, *_):
         _logger.info("Authorization successful")
 
 
-def handle_game_start(client, _, websocket):
+def handle_game_start(client, game_config, websocket):
     assert client.state == ClientState.Idle, (f"Game can only be started in idle state! State right now is: "
                                               f"{client.state}")
-    client.context = ClientContext()
+    client.context = ClientContext(game_config["tickLength"], game_config["turnRate"])
     client.state = ClientState.InGame
     _send_websocket_message(websocket, {"eventType": "startAck", "data": {}})
 
@@ -72,7 +75,7 @@ def handle_game_tick(client, raw_state, websocket):
 
 
 def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command | None:
-    timeout_ms = int(get_config("tick_ms")) - _TICK_FAILSAFE_TIME_MS
+    timeout_ms = client.context.tick_length_ms - _TICK_FAILSAFE_TIME_MS
     try:
         with ThreadPool() as pool:
             return pool.apply_async(process_tick, (client.context, state)).get(
@@ -86,7 +89,7 @@ def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command
 def handle_game_end(client, _, websocket):
     assert client.state == ClientState.InGame, (f"Game can only be ended in in game state! State right now is: "
                                                 f"{client.state}")
-    client.context = ClientContext()
+    client.context = None
     client.state = ClientState.Idle
     _send_websocket_message(websocket, {"eventType": "endAck", "data": {}})
 
