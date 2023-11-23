@@ -197,7 +197,8 @@ class WebsocketFeatures:
 
         handle_loop(Mock(), websocket)
 
-    def should_log_error_on_handler_throw(self):
+    def should_log_error_on_handler_throw(self, monkeypatch):
+        monkeypatch.setenv("wrapper_verbose_exceptions", "false")
         event_name = "myTestEvent"
         test_handler = Mock()
         mock_error = Exception("my error message")
@@ -212,5 +213,24 @@ class WebsocketFeatures:
             handle_loop(client, websocket)
             mock_logger.error.assert_called_with(f"Exception raised during websocket event handling! "
                                                  f"Exception: '{mock_error}'")
+
+        test_handler.assert_called_with(client, mock_data, websocket)
+
+    def should_log_verbose_error_on_handler_throw_if_configured(self, monkeypatch):
+        monkeypatch.setenv("wrapper_verbose_exceptions", "true")
+        event_name = "myTestEvent"
+        test_handler = Mock()
+        mock_error = Exception("my error message")
+        test_handler.side_effect = mock_error
+        websocket_wrapper._EVENT_HANDLERS = {event_name: test_handler}
+        websocket = Mock()
+        client = Mock()
+        mock_data = {"mock_data": 1}
+        websocket.recv.return_value = json.dumps({"eventType": event_name, "data": mock_data})
+
+        with patch("apiwrapper.websocket_wrapper._logger") as mock_logger:
+            handle_loop(client, websocket)
+            mock_logger.exception.assert_called_with(f"Exception raised during websocket event handling! "
+                                                     f"Exception: '{mock_error}'")
 
         test_handler.assert_called_with(client, mock_data, websocket)

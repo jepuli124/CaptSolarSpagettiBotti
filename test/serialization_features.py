@@ -49,7 +49,7 @@ class SerializationFeatures:
                     "data": {
                         "id": "myShipId",
                         "position": {"x": 1, "y": 2},
-                        "direction": "northEast",
+                        "direction": "ne",
                         "health": 10,
                         "heat": 3
                     }
@@ -73,7 +73,7 @@ class SerializationFeatures:
                     "data": {
                         "id": "projectileId",
                         "position": {"x": 5, "y": 3},
-                        "direction": "southWest",
+                        "direction": "sw",
                         "velocity": 4,
                         "mass": 2
                     }
@@ -124,7 +124,7 @@ class SerializationFeatures:
         json = serialize_command(action)
 
         assert json["action"] == "turn"
-        assert json["payload"]["direction"] == "west"
+        assert json["payload"]["direction"] == "w"
 
     def should_include_speed_and_mass_on_shoot_action_serialization(self):
         action = Command("shoot", ShootActionData(2, 5))
