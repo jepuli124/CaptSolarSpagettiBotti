@@ -11,25 +11,25 @@ _CELL_TYPE_MAPPING = {
 }
 
 _COMPASS_DESERIALIZATION_MAPPING = {
-    "north": CompassDirection.North,
-    "northEast": CompassDirection.NorthEast,
-    "east": CompassDirection.East,
-    "southEast": CompassDirection.SouthEast,
-    "south": CompassDirection.South,
-    "southWest": CompassDirection.SouthWest,
-    "west": CompassDirection.West,
-    "northWest": CompassDirection.NorthWest
+    "n": CompassDirection.North,
+    "ne": CompassDirection.NorthEast,
+    "e": CompassDirection.East,
+    "se": CompassDirection.SouthEast,
+    "s": CompassDirection.South,
+    "sw": CompassDirection.SouthWest,
+    "w": CompassDirection.West,
+    "nw": CompassDirection.NorthWest
 }
 
 _COMPASS_SERIALIZATION_MAPPING = {
-    CompassDirection.North: "north",
-    CompassDirection.NorthEast: "northEast",
-    CompassDirection.East: "east",
-    CompassDirection.SouthEast: "southEast",
-    CompassDirection.South: "south",
-    CompassDirection.SouthWest: "southWest",
-    CompassDirection.West: "west",
-    CompassDirection.NorthWest: "northWest"
+    CompassDirection.North: "n",
+    CompassDirection.NorthEast: "ne",
+    CompassDirection.East: "e",
+    CompassDirection.SouthEast: "se",
+    CompassDirection.South: "s",
+    CompassDirection.SouthWest: "sw",
+    CompassDirection.West: "w",
+    CompassDirection.NorthWest: "nw"
 }
 
 
