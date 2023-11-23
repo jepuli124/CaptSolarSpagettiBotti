@@ -7,7 +7,7 @@ from apiwrapper.models import Cell, CellType, Coordinates, CompassDirection, Com
 from apiwrapper.serialization import deserialize_map, deserialize_game_state, serialize_command
 
 
-
+# noinspection PyMethodMayBeStatic
 class SerializationFeatures:
 
     def should_deserialize_cell_with_no_data_based_on_type(self):

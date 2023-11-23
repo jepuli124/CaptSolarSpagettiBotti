@@ -22,35 +22,35 @@ class GetCoordinateDifferenceFeatures:
 # noinspection PyMethodMayBeStatic
 class GetApproximateDirectionFeatures:
 
-    @pytest.mark.parametrize("x,y,expected_direction", [(1, 0, CompassDirection.North),
-                                                        (1, 1, CompassDirection.NorthEast),
+    @pytest.mark.parametrize("x,y,expected_direction", [(-1, 0, CompassDirection.North),
+                                                        (-1, 1, CompassDirection.NorthEast),
                                                         (0, 1, CompassDirection.East),
-                                                        (-1, 1, CompassDirection.SouthEast),
-                                                        (-1, 0, CompassDirection.South),
-                                                        (-1, -1, CompassDirection.SouthWest),
+                                                        (1, 1, CompassDirection.SouthEast),
+                                                        (1, 0, CompassDirection.South),
+                                                        (1, -1, CompassDirection.SouthWest),
                                                         (0, -1, CompassDirection.West),
-                                                        (1, -1, CompassDirection.NorthWest)])
+                                                        (-1, -1, CompassDirection.NorthWest)])
     def should_return_the_correct_compass_direction_for_exact_directions(self, x: int, y: int,
                                                                          expected_direction: CompassDirection):
         actual_direction = get_approximate_direction(Coordinates(x, y))
         assert actual_direction == expected_direction
 
-    @pytest.mark.parametrize("x,y,expected_direction", [(5, 1, CompassDirection.North),
-                                                        (5, -1, CompassDirection.North),
-                                                        (4, 5, CompassDirection.NorthEast),
-                                                        (5, 4, CompassDirection.NorthEast),
-                                                        (1, 5, CompassDirection.East),
+    @pytest.mark.parametrize("x,y,expected_direction", [(-5, 1, CompassDirection.North),
+                                                        (-5, -1, CompassDirection.North),
+                                                        (-4, 5, CompassDirection.NorthEast),
+                                                        (-5, 4, CompassDirection.NorthEast),
                                                         (-1, 5, CompassDirection.East),
-                                                        (-5, 4, CompassDirection.SouthEast),
-                                                        (-4, 5, CompassDirection.SouthEast),
-                                                        (-5, 1, CompassDirection.South),
-                                                        (-5, -1, CompassDirection.South),
-                                                        (-5, -4, CompassDirection.SouthWest),
-                                                        (-4, -4, CompassDirection.SouthWest),
-                                                        (1, -5, CompassDirection.West),
+                                                        (1, 5, CompassDirection.East),
+                                                        (5, 4, CompassDirection.SouthEast),
+                                                        (4, 5, CompassDirection.SouthEast),
+                                                        (5, 1, CompassDirection.South),
+                                                        (5, -1, CompassDirection.South),
+                                                        (5, -4, CompassDirection.SouthWest),
+                                                        (4, -4, CompassDirection.SouthWest),
                                                         (-1, -5, CompassDirection.West),
-                                                        (4, -5, CompassDirection.NorthWest),
-                                                        (5, -4, CompassDirection.NorthWest)])
+                                                        (1, -5, CompassDirection.West),
+                                                        (-4, -5, CompassDirection.NorthWest),
+                                                        (-5, -4, CompassDirection.NorthWest)])
     def should_give_closest_compass_direction_if_not_exact(self, x: int, y: int, expected_direction: CompassDirection):
         actual_direction = get_approximate_direction(Coordinates(x, y))
         assert actual_direction == expected_direction
@@ -62,7 +62,7 @@ class GetEntityCoordinatesFeatures:
     def should_give_entity_coordinates_for_single_cell_entity(self):
         empty = Cell(CellType.Empty, {})
         entity = Cell(CellType.Projectile,
-                      ProjectileData("entity", Coordinates(1, 2), CompassDirection.NorthEast, 3, 4))
+                      ProjectileData("entity", Coordinates(1, 1), CompassDirection.NorthEast, 3, 4))
         game_map = [[empty, empty, empty, empty],
                     [empty, entity, empty, empty],
                     [empty, empty, empty, empty],
@@ -74,7 +74,7 @@ class GetEntityCoordinatesFeatures:
         empty = Cell(CellType.Empty, {})
         hit_box = Cell(CellType.HitBox, HitBoxData("entity"))
         entity = Cell(CellType.Projectile,
-                      ProjectileData("entity", Coordinates(3, 1), CompassDirection.NorthEast, 3, 4))
+                      ProjectileData("entity", Coordinates(3, 3), CompassDirection.NorthEast, 3, 4))
         game_map = [[empty, empty, empty, empty, empty],
                     [empty, empty, empty, empty, empty],
                     [empty, empty, hit_box, hit_box, hit_box],

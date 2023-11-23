@@ -19,7 +19,7 @@ def get_coordinate_difference(origin: Coordinates, target: Coordinates) -> Coord
 
 
 def _get_vector_angle_degrees(vector: Coordinates) -> float:
-    return (math.atan2(vector.y, vector.x) * 180 / math.pi) % 360
+    return (math.atan2(vector.y, -vector.x) * 180 / math.pi) % 360
 
 
 def get_approximate_direction(vector: Coordinates) -> CompassDirection:
@@ -44,7 +44,7 @@ def get_approximate_direction(vector: Coordinates) -> CompassDirection:
 
 def get_entity_coordinates(entity_id: str, game_map: list[list[Cell]]) -> Coordinates:
     # y coordinates start at the bottom
-    for y, row in enumerate(game_map[::-1]):
+    for y, row in enumerate(game_map):
         for x, cell in enumerate(row):
             if cell.cell_type in (CellType.Ship, CellType.Projectile):
                 if cell.data.id == entity_id:
