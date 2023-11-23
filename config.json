@@ -5,6 +5,7 @@
   "wrapper_log_file": "wrapper.log",
   "wrapper_log_stream": "stdout",
   "wrapper_log_level": "DEBUG",
+  "wrapper_verbose_exceptions": true,
   "team_ai_log_file": "wrapper.log",
   "team_ai_log_stream": "stdout",
   "team_ai_log_level": "DEBUG"

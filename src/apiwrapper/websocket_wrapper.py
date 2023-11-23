@@ -136,4 +136,7 @@ def try_run_handler(client: Client, message: dict, websocket, handler):
     try:
         handler(client, message["data"], websocket)
     except Exception as exception:
-        _logger.error(f"Exception raised during websocket event handling! Exception: '{exception}'")
+        if get_config("wrapper_verbose_exceptions"):
+            _logger.exception(f"Exception raised during websocket event handling! Exception: '{exception}'")
+        else:
+            _logger.error(f"Exception raised during websocket event handling! Exception: '{exception}'")
