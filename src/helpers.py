@@ -43,7 +43,6 @@ def get_approximate_direction(vector: Coordinates) -> CompassDirection:
 
 
 def get_entity_coordinates(entity_id: str, game_map: list[list[Cell]]) -> Coordinates:
-    # y coordinates start at the bottom
     for y, row in enumerate(game_map):
         for x, cell in enumerate(row):
             if cell.cell_type in (CellType.Ship, CellType.Projectile):
