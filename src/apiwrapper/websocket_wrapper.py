@@ -78,12 +78,22 @@ def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command
     timeout_ms = client.context.tick_length_ms - _TICK_FAILSAFE_TIME_MS
     try:
         with ThreadPool() as pool:
-            return pool.apply_async(process_tick, (client.context, state)).get(
+            return pool.apply_async(_process_tick_wrapper, (client.context, state)).get(
                 timeout=(timeout_ms / 1000))
     except multiprocessing.TimeoutError:
         # We catch and log instead of propagating so the wrapper layer still knows to send an empty event
         _logger.error(f"Team ai function timed out after {timeout_ms} milliseconds.")
         return None
+
+
+def _process_tick_wrapper(context: ClientContext, state: GameState) -> Command:
+    try:
+        return process_tick(context, state)
+    except Exception as exception:
+        if get_config("wrapper_verbose_exceptions") and get_config("wrapper_verbose_exceptions") != "false":
+            _logger.exception(f"Exception raised in team ai tick processing code: {exception}")
+        else:
+            _logger.error(f"Exception raised in team ai tick processing code: {exception}")
 
 
 def handle_game_end(client, _, websocket):
