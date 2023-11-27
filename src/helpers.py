@@ -52,10 +52,10 @@ def get_entity_coordinates(entity_id: str, game_map: list[list[Cell]]) -> Coordi
     return None
 
 
-def get_partial_turn(starting_direction: CompassDirection, target_direction: CompassDirection) -> CompassDirection:
-    max_turn_radius = int(get_config("max_turn_radius"))
+def get_partial_turn(starting_direction: CompassDirection, target_direction: CompassDirection, turn_rate: int)\
+        -> CompassDirection:
     initial_turn = (target_direction.value - starting_direction.value) % 8
     if initial_turn > 4:  # turning counterclockwise
         initial_turn -= 8
-        return CompassDirection(starting_direction.value + max(initial_turn, -max_turn_radius))
-    return CompassDirection(starting_direction.value + min(initial_turn, max_turn_radius))
+        return CompassDirection((starting_direction.value + max(initial_turn, -turn_rate)) % 8)
+    return CompassDirection((starting_direction.value + min(initial_turn, turn_rate)) % 8)

@@ -1,7 +1,3 @@
-from unittest.mock import patch
-
-import pytest
-
 from apiwrapper.models import Cell, CellType, Coordinates, CompassDirection, Command, MoveActionData, \
     TurnActionData, ShootActionData
 from apiwrapper.serialization import deserialize_map, deserialize_game_state, serialize_command

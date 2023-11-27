@@ -1,6 +1,6 @@
 import pytest
 
-from apiwrapper.models import Coordinates, CompassDirection, Cell, CellType, HitBoxData, ShipData, ProjectileData
+from apiwrapper.models import Coordinates, CompassDirection, Cell, CellType, HitBoxData, ProjectileData
 from helpers import get_coordinate_difference, get_approximate_direction, get_entity_coordinates, get_partial_turn
 
 
@@ -87,22 +87,18 @@ class GetEntityCoordinatesFeatures:
 # noinspection PyMethodMayBeStatic
 class GetPartialTurnFeatures:
 
-    def should_return_given_direction_if_turn_is_not_too_sharp(self, monkeypatch):
-        monkeypatch.setenv("max_turn_radius", "2")
-        actual_direction = get_partial_turn(CompassDirection.North, CompassDirection.East)
+    def should_return_given_direction_if_turn_is_not_too_sharp(self):
+        actual_direction = get_partial_turn(CompassDirection.North, CompassDirection.East, 2)
         assert actual_direction == CompassDirection.East
 
-    def should_return_less_sharp_turn_if_turn_is_too_sharp(self, monkeypatch):
-        monkeypatch.setenv("max_turn_radius", "2")
-        actual_direction = get_partial_turn(CompassDirection.North, CompassDirection.SouthEast)
+    def should_return_less_sharp_turn_if_turn_is_too_sharp(self):
+        actual_direction = get_partial_turn(CompassDirection.North, CompassDirection.SouthEast, 2)
         assert actual_direction == CompassDirection.East
 
-    def should_turn_clockwise_if_half_circle_turn_required(self, monkeypatch):
-        monkeypatch.setenv("max_turn_radius", "2")
-        actual_direction = get_partial_turn(CompassDirection.NorthEast, CompassDirection.SouthWest)
+    def should_turn_clockwise_if_half_circle_turn_required(self):
+        actual_direction = get_partial_turn(CompassDirection.NorthEast, CompassDirection.SouthWest, 2)
         assert actual_direction == CompassDirection.SouthEast
 
-    def should_function_correctly_for_counterclockwise_turns(self, monkeypatch):
-        monkeypatch.setenv("max_turn_radius", "1")
-        actual_direction = get_partial_turn(CompassDirection.NorthEast, CompassDirection.West)
+    def should_function_correctly_for_counterclockwise_turns(self):
+        actual_direction = get_partial_turn(CompassDirection.NorthEast, CompassDirection.West, 1)
         assert actual_direction == CompassDirection.North

@@ -4,8 +4,6 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-import team_ai
-import apiwrapper.serialization
 from apiwrapper import websocket_wrapper
 from apiwrapper.models import GameState, Cell, CellType, Command, MoveActionData
 from apiwrapper.websocket_wrapper import Client, handle_auth_ack, ClientState, handle_game_start, ClientContext, \
