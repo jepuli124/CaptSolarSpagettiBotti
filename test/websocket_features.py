@@ -126,6 +126,60 @@ class WebsocketFeatures:
         handle_game_tick(client, Mock(), websocket)
         mock_command_serialization.assert_called_with(Command("move", MoveActionData(0)))
 
+    @patch("apiwrapper.websocket_wrapper.serialize_command")
+    @patch("apiwrapper.websocket_wrapper.deserialize_game_state")
+    @patch("apiwrapper.websocket_wrapper.process_tick")
+    def should_log_exception_with_note_if_exception_raised_in_user_code_in_process_tick(self, mock_tick_handler,
+                                                                                        mock_state_deserialization,
+                                                                                        mock_command_serialization,
+                                                                                        monkeypatch):
+        monkeypatch.setenv("wrapper_verbose_exceptions", "false")
+        client = Client(ClientState.InGame)
+        client.context = ClientContext(1000, 2)
+        websocket = Mock()
+        move_command_dict = {
+            "actionType": "move",
+            "payload": {"distance": 3}
+        }
+        mock_state = GameState(1, [[Cell(CellType.Empty, {})]])
+        mock_state_deserialization.return_value = mock_state
+        expected_exception = Exception("PEBCAK")
+        mock_tick_handler.side_effect = expected_exception
+        mock_command_serialization.return_value = move_command_dict
+        with patch("apiwrapper.websocket_wrapper._logger") as mock_logger:
+            handle_game_tick(client, Mock(), websocket)
+            mock_logger.error.assert_called_with(
+                f"Exception raised in team ai tick processing code: {expected_exception}")
+
+        mock_command_serialization.assert_called_with(Command("move", MoveActionData(0)))
+
+    @patch("apiwrapper.websocket_wrapper.serialize_command")
+    @patch("apiwrapper.websocket_wrapper.deserialize_game_state")
+    @patch("apiwrapper.websocket_wrapper.process_tick")
+    def should_log_verbosely_if_exception_raised_in_process_tick_and_verbose_logging(self, mock_tick_handler,
+                                                                                     mock_state_deserialization,
+                                                                                     mock_command_serialization,
+                                                                                     monkeypatch):
+        monkeypatch.setenv("wrapper_verbose_exceptions", "true")
+        client = Client(ClientState.InGame)
+        client.context = ClientContext(1000, 2)
+        websocket = Mock()
+        move_command_dict = {
+            "actionType": "move",
+            "payload": {"distance": 3}
+        }
+        mock_state = GameState(1, [[Cell(CellType.Empty, {})]])
+        mock_state_deserialization.return_value = mock_state
+        expected_exception = Exception("PEBCAK")
+        mock_tick_handler.side_effect = expected_exception
+        mock_command_serialization.return_value = move_command_dict
+        with patch("apiwrapper.websocket_wrapper._logger") as mock_logger:
+            handle_game_tick(client, Mock(), websocket)
+            mock_logger.exception.assert_called_with(
+                f"Exception raised in team ai tick processing code: {expected_exception}")
+
+        mock_command_serialization.assert_called_with(Command("move", MoveActionData(0)))
+
     @pytest.mark.parametrize("state", [ClientState.Unauthorized, ClientState.Idle, ClientState.Unconnected])
     def should_raise_exception_on_game_tick_if_state_is_not_in_game(self, state: ClientState):
         client = Client(state)
