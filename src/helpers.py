@@ -1,17 +1,18 @@
 import json
 import math
 import os
+from typing import cast
 
-from apiwrapper.models import Coordinates, CompassDirection, Cell, CellType
+from apiwrapper.models import Coordinates, CompassDirection, Cell, CellType, ProjectileData, ShipData
 
 
-def get_config(config_name: str) -> str | int:
+def get_config(config_name: str) -> str:
     config = os.getenv(config_name, None)
     if config is None:
         file_path = os.path.join(os.path.dirname(__file__), "../config.json")
         with open(file_path, "r", encoding="utf-8") as config_file:
             config = json.loads(config_file.read())[config_name]
-    return config
+    return str(config)
 
 
 def get_coordinate_difference(origin: Coordinates, target: Coordinates) -> Coordinates:
@@ -42,12 +43,13 @@ def get_approximate_direction(vector: Coordinates) -> CompassDirection:
     return CompassDirection.NorthWest
 
 
-def get_entity_coordinates(entity_id: str, game_map: list[list[Cell]]) -> Coordinates:
+def get_entity_coordinates(entity_id: str, game_map: list[list[Cell]]) -> Coordinates | None:
     for y, row in enumerate(game_map):
         for x, cell in enumerate(row):
             if cell.cell_type in (CellType.Ship, CellType.Projectile):
-                if cell.data.id == entity_id:
+                if cast(ShipData | ProjectileData, cell.data).id == entity_id:
                     return Coordinates(x, y)
+    return None
 
 
 def get_partial_turn(starting_direction: CompassDirection, target_direction: CompassDirection) -> CompassDirection:

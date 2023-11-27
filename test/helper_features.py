@@ -68,7 +68,7 @@ class GetEntityCoordinatesFeatures:
                     [empty, empty, empty, empty],
                     [empty, empty, empty, empty]]
         actual_coordinates = get_entity_coordinates("entity", game_map)
-        assert actual_coordinates == entity.data.position
+        assert actual_coordinates == entity.data.position # type: ignore
 
     def should_ignore_hit_box_coordinates_and_return_actual_entity(self):
         empty = Cell(CellType.Empty, {})
@@ -81,7 +81,7 @@ class GetEntityCoordinatesFeatures:
                     [empty, empty, hit_box, entity, hit_box],
                     [empty, empty, hit_box, hit_box, hit_box]]
         actual_coordinates = get_entity_coordinates("entity", game_map)
-        assert actual_coordinates == entity.data.position
+        assert actual_coordinates == entity.data.position # type: ignore
 
 
 # noinspection PyMethodMayBeStatic

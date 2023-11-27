@@ -3,6 +3,7 @@ import multiprocessing
 from enum import Enum
 from logging import getLogger
 from multiprocessing.pool import ThreadPool
+from typing import cast
 
 from websockets.sync.client import connect
 
@@ -37,9 +38,9 @@ class ClientContext:
 
 
 class Client:
-    def __init__(self, state: ClientState = ClientState.Unconnected, context: ClientContext = None):
+    def __init__(self, state: ClientState = ClientState.Unconnected, context: ClientContext | None = None):
         self.state: ClientState = state
-        self.context: ClientContext = context
+        self.context: ClientContext | None = context
 
 
 def _send_websocket_message(websocket, raw_message: dict):
@@ -75,6 +76,8 @@ def handle_game_tick(client, raw_state, websocket):
 
 
 def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command | None:
+    if client.context is None:
+        raise ValueError("Context is None, but state is in game!")
     timeout_ms = client.context.tick_length_ms - _TICK_FAILSAFE_TIME_MS
     try:
         with ThreadPool() as pool:
@@ -86,7 +89,7 @@ def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command
         return None
 
 
-def _process_tick_wrapper(context: ClientContext, state: GameState) -> Command:
+def _process_tick_wrapper(context: ClientContext, state: GameState) -> Command | None:
     try:
         return process_tick(context, state)
     except Exception as exception:
