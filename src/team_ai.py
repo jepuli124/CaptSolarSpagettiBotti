@@ -37,10 +37,7 @@ def process_tick(context: ClientContext, game_state: GameState) -> Command | Non
         Command: `apiwrapper.models.Command` instance containing the type and data of the command to be executed on the
         tick.
     """
-    start_time = time()
     ai_logger.info("processing tick")
 
     # please add your code here
-
-    ai_logger.debug(f"tick processed in {((time() - start_time) * 1000):.2f} milliseconds")
     return None

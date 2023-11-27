@@ -3,6 +3,7 @@ import multiprocessing
 from enum import Enum
 from logging import getLogger
 from multiprocessing.pool import ThreadPool
+from time import time
 
 from websockets.sync.client import connect
 
@@ -16,6 +17,7 @@ _TICK_FAILSAFE_TIME_MS = 20
 
 
 _logger = getLogger("wrapper.websockets")
+_team_ai_logger = getLogger("team_ai.timer")
 
 
 class ClientState(Enum):
@@ -86,14 +88,18 @@ def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command
         return None
 
 
-def _process_tick_wrapper(context: ClientContext, state: GameState) -> Command:
+def _process_tick_wrapper(context: ClientContext, state: GameState) -> Command | None:
     try:
-        return process_tick(context, state)
+        start_time = time()
+        result = process_tick(context, state)
+        _team_ai_logger.debug(f"tick processed in {((time() - start_time) * 1000):.2f} milliseconds")
     except Exception as exception:
         if get_config("wrapper_verbose_exceptions") and get_config("wrapper_verbose_exceptions") != "false":
             _logger.exception(f"Exception raised in team ai tick processing code: {exception}")
         else:
             _logger.error(f"Exception raised in team ai tick processing code: {exception}")
+        return None
+    return result
 
 
 def handle_game_end(client, _, websocket):
