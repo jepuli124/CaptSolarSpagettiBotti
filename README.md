@@ -97,6 +97,10 @@ function. This ensures the wrapper can send a command every tick.
 
 # Models
 
-Model data can be found in MODELS.md
+Model data can be found in [MODELS.md](MODELS.md)
+
+# Game loop
+
+Game loop is described in [GAME_REFERENCE.md](GAME_REFERENCE.md)
 
 
