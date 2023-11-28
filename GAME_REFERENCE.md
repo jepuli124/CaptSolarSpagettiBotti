@@ -19,8 +19,8 @@ fails to provide a command in time, or throws an exception while processing the 
 "move 0" is sent automatically.
  - Turn to face a compass direction. How many compass direction steps can be turned in
 one tick can be found in the [client context](MODELS.md#clientcontext)
- - Shoot a projectile with mass and velocity both between 1 and 4. This generates
-`mass * velocity` [heat](#heat). A projectile hitting a ship deals `mass * 2 + velocity`
+ - Shoot a projectile with mass and speed both between 1 and 4. This generates
+`mass * speed` [heat](#heat). A projectile hitting a ship deals `mass * 2 + speed`
 damage.
 
 ## Ship attributes
@@ -38,7 +38,7 @@ ship is destroyed.
 Ships take damage from coming into contact with a projectile, another ship, or exceeding
 their max heat.
 
-Projectile damage is calculated as `projectile_mass * 2 + projectile_velocity`
+Projectile damage is calculated as `projectile_mass * 2 + projectile_speed`
 
 Ship contact damage is fixed `3` for the ship trying to move to a space with another ship.
 The move command is not performed in this case.
@@ -51,7 +51,7 @@ to damage in a ratio of `1 heat : 1 damage`
 Heat is the heat accumulated from firing the ship weaponry. The ships are engaged in the
 upper atmosphere of a planet and thus heat is dissipated by moving.
 
-Heat accumulates on shoot actions via the formula `projectile_mass * projectile_velocity`.
+Heat accumulates on shoot actions via the formula `projectile_mass * projectile_speed`.
 
 Heat dissipates on move actions via the formula `distance * 2`
 
@@ -72,11 +72,11 @@ cell.
 
 The mass of the projectile between 1 and 4. Main component in projectile damage.
 
-### Velocity
+### speed
 
-The velocity of the projectile between 1 and 4. Some effect on damage, but also affects
+The speed of the projectile between 1 and 4. Some effect on damage, but also affects
 how many cells the projectile moves each tick.
 
 ### Damage
 
-Projectile damage is calculated as `mass * 2 + velocity`
+Projectile damage is calculated as `mass * 2 + speed`

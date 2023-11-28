@@ -70,7 +70,7 @@ class SerializationFeatures:
                         "id": "projectileId",
                         "position": {"x": 5, "y": 3},
                         "direction": "sw",
-                        "velocity": 4,
+                        "speed": 4,
                         "mass": 2
                     }
                 }
@@ -82,7 +82,7 @@ class SerializationFeatures:
         assert expected_projectile.data.id == "projectileId"
         assert expected_projectile.data.position == Coordinates(5, 3)
         assert expected_projectile.data.direction == CompassDirection.SouthWest
-        assert expected_projectile.data.velocity == 4
+        assert expected_projectile.data.speed == 4
         assert expected_projectile.data.mass == 2
 
     def should_deserialize_whole_matrix_at_a_time(self):

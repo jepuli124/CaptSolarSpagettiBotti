@@ -49,7 +49,7 @@ def _deserialize_ship(ship_data: dict) -> ShipData:
 def _deserialize_projectile(projectile_data: dict) -> ProjectileData:
     projectile_coordinates = Coordinates(projectile_data["position"]["x"], projectile_data["position"]["y"])
     return ProjectileData(projectile_data["id"], projectile_coordinates,
-                          _COMPASS_DESERIALIZATION_MAPPING[projectile_data["direction"]], projectile_data["velocity"],
+                          _COMPASS_DESERIALIZATION_MAPPING[projectile_data["direction"]], projectile_data["speed"],
                           projectile_data["mass"])
 
 

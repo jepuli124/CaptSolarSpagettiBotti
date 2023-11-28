@@ -94,13 +94,13 @@ class ProjectileData(EntityData):
     """Data holder for the projectile cell type
 
     Attributes:
-        velocity (int): the velocity of the projectile. How many cells the projectile moves in one tick
+        speed (int): the speed of the projectile. How many cells the projectile moves in one tick
         mass (int): the mass of the projectile. Main part of the projectile damage
 
     Note:
-        projectile damage on hit is calculated as velocity + mass * 2
+        projectile damage on hit is calculated as speed + mass * 2
     """
-    velocity: int
+    speed: int
     mass: int
 
 

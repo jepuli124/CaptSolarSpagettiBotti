@@ -9,7 +9,7 @@ from time import time
 from websockets.sync.client import connect
 
 from helpers import get_config
-from apiwrapper.models import Command, MoveActionData, GameState, ClientContext
+from apiwrapper.models import Command, MoveActionData, GameState, ClientContext, ActionType
 from apiwrapper.serialization import deserialize_game_state, serialize_command
 from team_ai import process_tick
 
@@ -61,7 +61,7 @@ def handle_game_tick(client, raw_state, websocket):
     action = _handle_tick_processing_timeout(client, state)
     # None is returned on timeout, should be converted to empty action -> move 0 steps
     if action is None:
-        action = Command("move", MoveActionData(0))
+        action = Command(ActionType.Move, MoveActionData(0))
     serialized_action = serialize_command(action)
     _send_websocket_message(websocket, {"eventType": "gameAction", "data": serialized_action})
 

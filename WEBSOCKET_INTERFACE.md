@@ -201,7 +201,7 @@ the python model
             "x": int,
             "y": int
         },
-        "velocity": int,
+        "speed": int,
         "mass": int
     }
 }
@@ -242,8 +242,8 @@ turn radius. Validated server-side
 
 ### Shoot
 
-Shoot a projectile. Generates `mass * velocity` heat, moves at `velocity` speed and
-does `mass * 2 + velocity` damage on impact. Heat exceeding `25` will be converted to
+Shoot a projectile. Generates `mass * speed` heat, moves at `speed` speed and
+does `mass * 2 + speed` damage on impact. Heat exceeding `25` will be converted to
 damage on your ship in a ratio of `1:1`
 
 
@@ -252,7 +252,7 @@ damage on your ship in a ratio of `1:1`
     "actionType": "shoot",
     "payload": {
         "mass": int,
-        "velocity": int
+        "speed": int
     }
 }
 ```

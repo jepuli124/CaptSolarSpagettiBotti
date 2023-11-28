@@ -88,7 +88,7 @@ class ProjectileData:
     id: str
     position: CompassDirection
     position: Coordinates
-    velocity: int
+    speed: int
     mass: int
 ```
 
@@ -132,15 +132,15 @@ class TurnActionData:
 
 ### Shoot
 
-Shoot a projectile. Generates `mass * velocity` heat, moves at `velocity` speed and
-does `mass * 2 + velocity` damage on impact. Heat exceeding `25` will be converted to
+Shoot a projectile. Generates `mass * speed` heat, moves at `speed` speed and
+does `mass * 2 + speed` damage on impact. Heat exceeding `25` will be converted to
 damage on your ship in a ratio of `1:1`
 
 
 ```python
 class ShootActionData:
     mass: int
-    velocity: int
+    speed: int
 ```
 
 # CompassDirection
