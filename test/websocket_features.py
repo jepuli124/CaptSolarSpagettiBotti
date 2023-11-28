@@ -127,6 +127,31 @@ class WebsocketFeatures:
     @patch("apiwrapper.websocket_wrapper.serialize_command")
     @patch("apiwrapper.websocket_wrapper.deserialize_game_state")
     @patch("apiwrapper.websocket_wrapper.process_tick")
+    def should_not_timeout_game_tick_processing_if_config_timeout_is_zero(self, mock_tick_handler,
+                                                                          mock_state_deserialization,
+                                                                          mock_command_serialization):
+        def delayed_processing(*_):
+            sleep(0.2)
+            return Command("move", MoveActionData(3))
+
+        client = Client(ClientState.InGame)
+        client.context = ClientContext(0, 2)
+        websocket = Mock()
+        move_command_dict = {
+            "actionType": "move",
+            "payload": {"distance": 3}
+        }
+        mock_state = GameState(1, [[Cell(CellType.Empty, {})]])
+        mock_state_deserialization.return_value = mock_state
+        mock_tick_handler.side_effect = delayed_processing
+        mock_tick_handler.return_value = Command("move", MoveActionData(3))
+        mock_command_serialization.return_value = move_command_dict
+        handle_game_tick(client, Mock(), websocket)
+        websocket.send.assert_called_with(json.dumps({"eventType": "gameAction", "data": move_command_dict}))
+
+    @patch("apiwrapper.websocket_wrapper.serialize_command")
+    @patch("apiwrapper.websocket_wrapper.deserialize_game_state")
+    @patch("apiwrapper.websocket_wrapper.process_tick")
     def should_log_exception_with_note_if_exception_raised_in_user_code_in_process_tick(self, mock_tick_handler,
                                                                                         mock_state_deserialization,
                                                                                         mock_command_serialization,

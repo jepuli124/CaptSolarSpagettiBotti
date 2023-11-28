@@ -1,5 +1,5 @@
 from apiwrapper.models import Cell, CellType, Coordinates, CompassDirection, Command, MoveActionData, \
-    TurnActionData, ShootActionData
+    TurnActionData, ShootActionData, ActionType
 from apiwrapper.serialization import deserialize_map, deserialize_game_state, serialize_command
 
 
@@ -107,7 +107,7 @@ class SerializationFeatures:
         assert result.game_map == [[Cell(CellType.Empty, {})]]
 
     def should_include_distance_on_move_action_serialization(self):
-        action = Command("move", MoveActionData(3))
+        action = Command(ActionType.Move, MoveActionData(3))
 
         json = serialize_command(action)
 
@@ -115,7 +115,7 @@ class SerializationFeatures:
         assert json["payload"]["distance"] == 3
 
     def should_include_direction_on_turn_action_serialization(self):
-        action = Command("turn", TurnActionData(CompassDirection.West))
+        action = Command(ActionType.Turn, TurnActionData(CompassDirection.West))
 
         json = serialize_command(action)
 
@@ -123,7 +123,7 @@ class SerializationFeatures:
         assert json["payload"]["direction"] == "w"
 
     def should_include_speed_and_mass_on_shoot_action_serialization(self):
-        action = Command("shoot", ShootActionData(2, 5))
+        action = Command(ActionType.Shoot, ShootActionData(2, 5))
 
         json = serialize_command(action)
 

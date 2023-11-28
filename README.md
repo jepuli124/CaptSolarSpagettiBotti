@@ -33,10 +33,10 @@ The client has the following configuration values:
 
  - `websocket_url`: the url of the game server websocket. Already configured
 in the repository.
- - `websocket_port`: the port of the game server websocket. Already configured
-in the repository.
- - `token`: the unique token identifying your bot client. Already configured
-in the repository.
+ - `token`: the unique token identifying your team. Already configured in the 
+repository.
+ - `bot_name`: the name of this bot. Is used to differentiate different bots from
+the same team.
  - `wrapper_log_file`: the file into which the wrapper writes its logs. Can be
 null to prevent wrapper from writing logs into a file. Default 'wrapper.log'.
 Doesn't need to be identical to team AI log file.
@@ -77,7 +77,11 @@ and `game_state` from the wrapper. It returns a `Command` object, or `None`. If
 at the start of a match, but preserved during the match. This means you are free
 to add data to it to keep the data available through the match. If you want to use
 type checking with context you can edit the `ClientContext` class in
-`src/apiwrapper/websocket_wrapper`.
+`src/apiwrapper/websocket_wrapper`. By default `context` has two members.
+`tick_length_ms` holds the value for max tick length. If you function takes longer
+than max length - 50 milliseconds, the wrapper will return move 0 steps automatically.
+`turn_rate` hold the maximum turn rate of the ship. The rate is given in 1/8ths of a
+circle, so each value represents being able to turn one compass direction.
 
 `Command` object should contain the type of the command (`Move`, `Turn` or `Shoot`)
 and the command data.
@@ -88,7 +92,11 @@ object. Use methods `ai_logger.debug("message")`, `ai_logger.info("message")`,
 `ai_logger.critical("message")` for the different levels of urgency in the log
 messages.
 
-Please note that there is a timeout of (tick_time - 100) milliseconds for the
+Please note that there is a timeout of (tick_time - 50) milliseconds for the
 function. This ensures the wrapper can send a command every tick.
+
+# Models
+
+Model data can be found in MODELS.md
 
 

@@ -5,7 +5,7 @@ from typing import Any
 
 from helpers import get_config
 
-# Borrowed from my own project: ClusterBot (see EddieTheCubeHead in github)  - Eetu
+# Borrowed from my own project: ClusterBot (see EddieTheCubeHead in GitHub)  - Eetu
 
 _LOG_LEVELS = {
     "DEBUG": DEBUG,

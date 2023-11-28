@@ -1,5 +1,5 @@
 from apiwrapper.models import Cell, CellType, HitBoxData, ShipData, Coordinates, CompassDirection, ProjectileData, \
-    GameState, Command, MoveActionData, TurnActionData, ShootActionData
+    GameState, Command, MoveActionData, TurnActionData, ShootActionData, ActionType
 
 _CELL_TYPE_MAPPING = {
     "empty": CellType.Empty,
@@ -93,11 +93,18 @@ def _serialize_shoot_action(action_data: ShootActionData) -> dict:
 
 
 _ACTION_SERIALIZATION_MAPPING = {
-    "move": _serialize_move_action,
-    "turn": _serialize_turn_action,
-    "shoot": _serialize_shoot_action
+    ActionType.Move: _serialize_move_action,
+    ActionType.Turn: _serialize_turn_action,
+    ActionType.Shoot: _serialize_shoot_action
+}
+
+_ACTION_TYPE_MAPPING = {
+    ActionType.Move: "move",
+    ActionType.Turn: "turn",
+    ActionType.Shoot: "shoot"
 }
 
 
 def serialize_command(command: Command) -> dict:
-    return {"action": command.action, "payload": _ACTION_SERIALIZATION_MAPPING[command.action](command.payload)}
+    return {"action": _ACTION_TYPE_MAPPING[command.action],
+            "payload": _ACTION_SERIALIZATION_MAPPING[command.action](command.payload)}

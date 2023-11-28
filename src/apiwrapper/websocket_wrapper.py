@@ -9,12 +9,12 @@ from time import time
 from websockets.sync.client import connect
 
 from helpers import get_config
-from apiwrapper.models import Command, MoveActionData, GameState
+from apiwrapper.models import Command, MoveActionData, GameState, ClientContext
 from apiwrapper.serialization import deserialize_game_state, serialize_command
 from team_ai import process_tick
 
 
-_TICK_FAILSAFE_TIME_MS = 20
+_TICK_FAILSAFE_TIME_MS = 50
 
 
 _logger = getLogger("wrapper.websockets")
@@ -26,17 +26,6 @@ class ClientState(Enum):
     Unauthorized = 1,
     Idle = 2,
     InGame = 3
-
-
-class ClientContext:
-    """The persistent context of the current game.
-
-    You can either add data to this class ad-hoc, or if you want or need static type checking you can edit this class
-    to include fields for the data you want to store between ticks."""
-
-    def __init__(self, tick_length_ms: int, turn_rate: int):
-        self.tick_length_ms = tick_length_ms
-        self.turn_rate = turn_rate
 
 
 class Client:
@@ -81,6 +70,8 @@ def _handle_tick_processing_timeout(client: Client, state: GameState) -> Command
     if client.context is None:
         raise ValueError("Context is None, but state is in game!")
     timeout_ms = client.context.tick_length_ms - _TICK_FAILSAFE_TIME_MS
+    if client.context.tick_length_ms == 0:
+        return _process_tick_wrapper(client.context, state)
     try:
         with ThreadPool() as pool:
             return pool.apply_async(_process_tick_wrapper, (client.context, state)).get(

@@ -7,6 +7,14 @@ from apiwrapper.models import Coordinates, CompassDirection, Cell, CellType, Pro
 
 
 def get_config(config_name: str) -> str:
+    """Get a config value from environment, falls back to config.json if config is not found in environment.
+
+    Arguments:
+        config_name (str): the name of the config value to get
+
+    Returns:
+        (str): the config found
+    """
     config = os.getenv(config_name, None)
     if config is None:
         file_path = os.path.join(os.path.dirname(__file__), "../config.json")
@@ -16,6 +24,15 @@ def get_config(config_name: str) -> str:
 
 
 def get_coordinate_difference(origin: Coordinates, target: Coordinates) -> Coordinates:
+    """Get the difference between two coordinates
+
+    Arguments:
+        origin (Coordinates): the origin (source) coordinates for the calculation
+        target (Coordinates): the target coordinates for the calculation
+
+    Returns:
+        (Coordinates): a vector representing the difference from origin to target
+    """
     return Coordinates(target.x - origin.x, target.y - origin.y)
 
 
@@ -24,6 +41,14 @@ def _get_vector_angle_degrees(vector: Coordinates) -> float:
 
 
 def get_approximate_direction(vector: Coordinates) -> CompassDirection:
+    """Get a compass direction most closely representing the given vector
+
+    Arguments:
+        vector (Coordinates): the vector which should be converted to approximate compass direction
+
+    Returns:
+        (CompassDirection): the compass direction closest to the vector
+    """
     angle = _get_vector_angle_degrees(vector)
     cutoff = 360 / 16
     if angle >= 15 * cutoff or angle < cutoff:
@@ -44,6 +69,15 @@ def get_approximate_direction(vector: Coordinates) -> CompassDirection:
 
 
 def get_entity_coordinates(entity_id: str, game_map: list[list[Cell]]) -> Coordinates | None:
+    """Get coordinates for a given entity from the given game map
+
+    Arguments:
+        entity_id (str): the id of the entity to search for in the map
+        game_map (list[list[Cell]]): the game map to search for the entity in
+
+    Returns:
+        (Coordinates | None): the entity coordinates if the entity exists, otherwise `None`
+    """
     for y, row in enumerate(game_map):
         for x, cell in enumerate(row):
             if cell.cell_type in (CellType.Ship, CellType.Projectile):
@@ -54,6 +88,20 @@ def get_entity_coordinates(entity_id: str, game_map: list[list[Cell]]) -> Coordi
 
 def get_partial_turn(starting_direction: CompassDirection, target_direction: CompassDirection, turn_rate: int)\
         -> CompassDirection:
+    """Get the compass direction that is the furthest one you are allowed to turn towards from the given starting
+    direction, given the turn rate.
+
+    Arguments:
+        starting_direction (CompassDirection): the starting direction for the turn
+        target_direction (CompassDirection): the target direction for the turn
+        turn_rate (int): the turn rate for the game, see `models.ClientContext.turn_rate`
+
+    Returns:
+        (CompassDirection): the furthest direction between starting and target directions allowed by the turn rate
+
+    Note:
+        If performing a 180-degree turn, the function will always perform the partial turn clockwise
+    """
     initial_turn = (target_direction.value - starting_direction.value) % 8
     if initial_turn > 4:  # turning counterclockwise
         initial_turn -= 8
