@@ -1,8 +1,8 @@
 # MustacheCorp Captain Solar
 
-The game is a tick-based 1v1 space battler played on a 2d grid. The grid size is 25
-cells by 25 cells. Each ship starts on their respective side on the grid with a
-randomized x coordinate. Both ships start facing towards the middle of the grid.
+The game is a tick-based 1v1 space battler played on a 2d grid. The grid size is 30
+cells by 30 cells. Each ship starts on their respective side (left/right) on the grid 
+with a randomized y coordinate. Both ships start facing towards the middle of the grid.
 
 ## Game flow
 
@@ -76,3 +76,7 @@ The mass of the projectile between 1 and 4. Main component in projectile damage.
 
 The velocity of the projectile between 1 and 4. Some effect on damage, but also affects
 how many cells the projectile moves each tick.
+
+### Damage
+
+Projectile damage is calculated as `mass * 2 + velocity`
