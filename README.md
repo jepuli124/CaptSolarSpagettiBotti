@@ -48,7 +48,7 @@ logging. From least critical to most critical level, the options are 'DEBUG',
 'INFO', 'WARNING', 'ERROR' and 'CRITICAL'. Default 'INFO'. If you want more
 verbose feedback about the wrapper during runtime it's recommended to set this to
 'DEBUG' and change the `wrapper_log_stream` config to 'stdout' or 'stderr'.
- - `team_ai_log_level`: the file into which the team AI writes its logs. Can be
+ - `team_ai_log_file`: the file into which the team AI writes its logs. Can be
 null to prevent team AI from writing logs into a file. Default 'wrapper.log'.
 Doesn't need to be identical to wrapper log file.
  - `team_ai_log_stream`: the stream into which the team AI writes its logs. Can
@@ -77,14 +77,14 @@ and `game_state` from the wrapper. It returns a `Command` object, or `None`. If
 at the start of a match, but preserved during the match. This means you are free
 to add data to it to keep the data available through the match. If you want to use
 type checking with context you can edit the `ClientContext` class in
-`src/apiwrapper/websocket_wrapper`. By default `context` has two members.
+`src/apiwrapper/models.py`. By default `ClientContext` has two members.
 `tick_length_ms` holds the value for max tick length. If you function takes longer
 than max length - 50 milliseconds, the wrapper will return move 0 steps automatically.
 `turn_rate` hold the maximum turn rate of the ship. The rate is given in 1/8ths of a
 circle, so each value represents being able to turn one compass direction.
 
-`Command` object should contain the type of the command (`Move`, `Turn` or `Shoot`)
-and the command data.
+`Command` object should contain the type of the action the bot should perform (`Move`,
+`Turn` or `Shoot`) and the action data payload.
 
 If you want to log the behaviour inside the function you can use the `ai_logger`
 object. Use methods `ai_logger.debug("message")`, `ai_logger.info("message")`,
