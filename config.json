@@ -1,10 +1,10 @@
 {
-  "websocket_url": "ws://localhost:8080/socket",
-  "token": "myBotToken",
+  "websocket_url": "wss://captsolar.mustachecorp.com:8081/api/socket",
+  "token": "test",
   "bot_name": "main",
   "wrapper_log_file": "wrapper.log",
   "wrapper_log_stream": "stdout",
-  "wrapper_log_level": "DEBUG",
+  "wrapper_log_level": "INFO",
   "wrapper_verbose_exceptions": true,
   "team_ai_log_file": "wrapper.log",
   "team_ai_log_stream": "stdout",

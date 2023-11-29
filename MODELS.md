@@ -18,12 +18,11 @@ class ClientContext:
 
 # GameState
 
-The `GameState` object houses two fields. `turnNumber` and `gameMap`. Please note that
-in the python code, these fields are accessed via pythonic snake_case names.
+The `GameState` object houses two fields. `turn_number` and `game_map`.
 
- - `turnNumber` or `turn_number` is a rolling integer denoting the current turn,
+ - `turn_number` is a rolling integer denoting the current turn,
 starting from 1.
- - `gameMap` is a matrix (array of arrays) of `Cell` objects. See [Cells](#cells) for
+ - `game_map` is a matrix (array of arrays) of `Cell` objects. See [Cells](#cells) for
 further reference
 
 ```python
@@ -34,7 +33,7 @@ class GameState:
 
 ## Cells
 
-Each cell houses a `Cell` object, with fields `cellType` and `data`. Cell type denotes
+Each cell houses a `Cell` object, with fields `cell_type` and `data`. Cell type denotes
 the cell type and data houses the unique data for each cell type. 
 
 ```python
@@ -95,7 +94,7 @@ class ProjectileData:
 # Command
 
 The bot sends command models as a response to server game tick events. Each command
-model has an `actionType` field and a `payload` field containing action type specific
+model has an `action_type` field and a `payload` field containing action type specific
 data.
 
 ```python
