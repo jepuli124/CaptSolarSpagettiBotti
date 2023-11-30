@@ -107,3 +107,12 @@ def get_partial_turn(starting_direction: CompassDirection, target_direction: Com
         initial_turn -= 8
         return CompassDirection((starting_direction.value + max(initial_turn, -turn_rate)) % 8)
     return CompassDirection((starting_direction.value + min(initial_turn, turn_rate)) % 8)
+
+
+def get_own_ship_id() -> str:
+    """Get the id of your ship
+
+    Returns:
+        The id of your ship as str
+    """
+    return f"ship:{get_config('token')}:{get_config('bot_name')}"
