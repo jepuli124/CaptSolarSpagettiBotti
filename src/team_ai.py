@@ -5,7 +5,10 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from apiwrapper.websocket_wrapper import ClientContext
-from apiwrapper.models import GameState, Command
+from apiwrapper.models import ActionType, GameState, Command, MoveActionData, ShootActionData, TurnActionData
+from helpers import *
+
+import random
 
 
 ai_logger = getLogger("team_ai")
@@ -24,7 +27,6 @@ Examples:
     >>> ai_logger.critical("A message about a critical exception, usually causing a premature shutdown")
 """
 
-
 def process_tick(context: ClientContext, game_state: GameState) -> Command | None:
     """Main function defining the behaviour of the AI of the team
 
@@ -42,7 +44,87 @@ def process_tick(context: ClientContext, game_state: GameState) -> Command | Non
 
         If your function takes longer than the max tick length the function is cancelled and None is returned.
     """
+
+
+
     ai_logger.info("processing tick")
 
+    y = -1
+    ourShip = [-1,-1]
+    heat = -1
+    target = [-1,-1]
+    targetAudio = [-1,-1]
+    direction = None
+    for slideOfMap in game_state.game_map:
+        y += 1
+        x = -1
+        for cell in slideOfMap:
+            x += 1
+            if cell.cell_type == CellType.Ship:
+                if cell.data.id == 'ship:SpagettiHolvi1211:main':
+                    heat = cell.data.heat
+                    ourShip[0] = cell.data.position.x
+                    ourShip[1] = cell.data.position.y
+                    direction = cell.data.direction
+                else:
+                    target[0] = cell.data.position.x
+                    target[1] = cell.data.position.y
+            if cell.cell_type == CellType.AudioSignature:
+                targetAudio[0] = x
+                targetAudio[1] = y
+            if cell.cell_type != CellType.OutOfVision and cell.cell_type != CellType.Empty:
+                print(cell, x, y)
+    print(ourShip)
+    print(target, targetAudio)
+    print(direction)
+    wantedDirection = None
+    if target[0] != -1:
+        x = ourShip[0]-target[0]
+        y = ourShip[1]-target[1]
+        if x > 0 and y > 0:
+            wantedDirection = CompassDirection.NorthEast
+        if x > 0 and y == 0:
+            wantedDirection = CompassDirection.East
+        if x > 0 and y < 0:
+            wantedDirection = CompassDirection.SouthEast
+        if x == 0 and y < 0:
+            wantedDirection = CompassDirection.South
+        if x < 0 and y < 0:
+            wantedDirection = CompassDirection.SouthWest
+        if x < 0 and y == 0:
+            wantedDirection = CompassDirection.West
+        if x < 0 and y > 0:
+            wantedDirection = CompassDirection.NorthWest
+        if x == 0 and y > 0:
+            wantedDirection = CompassDirection.North
+    else:
+        x = ourShip[0]-targetAudio[0]
+        y = ourShip[1]-targetAudio[1]
+        if x > 0 and y > 0:
+            wantedDirection = CompassDirection.NorthEast
+        if x > 0 and y == 0:
+            wantedDirection = CompassDirection.East
+        if x > 0 and y < 0:
+            wantedDirection = CompassDirection.SouthEast
+        if x == 0 and y < 0:
+            wantedDirection = CompassDirection.South
+        if x < 0 and y < 0:
+            wantedDirection = CompassDirection.SouthWest
+        if x < 0 and y == 0:
+            wantedDirection = CompassDirection.West
+        if x < 0 and y > 0:
+            wantedDirection = CompassDirection.NorthWest
+        if x == 0 and y > 0:
+            wantedDirection = CompassDirection.North
+
     # please add your code here
+    heatGenerated = 4
+    playerId = "ship:spagettiraketti:main"
+    playerCoordinates = get_entity_coordinates(playerId, game_state.game_map)
+    if 25-game_state.game_map[playerCoordinates.y][playerCoordinates.x].data.heat < heatGenerated:
+        return Command(action=ActionType.Move, payload=MoveActionData(1))
+    elif direction == wantedDirection:#oikee suunta
+        return Command(action=ActionType.Shoot, payload=ShootActionData(4,1))
+    else:
+        return Command(action=ActionType.Turn, payload=TurnActionData(get_partial_turn(wantedDirection)))
     return None

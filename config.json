@@ -1,6 +1,6 @@
 {
   "websocket_url": "wss://captsolar.mustachecorp.com:8081/api/socket",
-  "token": "Spagettiholvi",
+  "token": "spagettiraketti",
   "bot_name": "main",
   "wrapper_log_file": "wrapper.log",
   "wrapper_log_stream": "stdout",
